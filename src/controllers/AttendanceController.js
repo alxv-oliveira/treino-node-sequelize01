@@ -44,9 +44,11 @@ module.exports = {
     const { id } = req.params;
     if (req.body.date) { req.body.date = moment(req.body.date, 'DD/MM/YYYY').format('YYYY-MM-DD HH:MM:SS'); }
 
-    const attendance = await (await Attendance.findByPk(id)).update(req.body);
+    const attendance = await Attendance.findByPk(id);
 
     if (!attendance) { return res.status(400).json({ error: 'Attendance not found' }); }
+
+    await attendance.update(req.body);
 
     return res.json(attendance);
   },
