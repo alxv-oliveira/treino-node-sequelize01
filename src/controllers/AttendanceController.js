@@ -1,4 +1,5 @@
 const moment = require('moment');
+const Op = require('sequelize/lib/operators');
 const Attendance = require('../models/Attendance');
 
 module.exports = {
@@ -24,14 +25,19 @@ module.exports = {
 
   async show(req, res) {
     const { client } = req.query;
-
-    const attendances = await Attendance.findAll();
+    const attendances = await Attendance.findOne(
+      {
+        where: {
+          client: {
+            [Op.iLike]: `%${client}%`,
+          },
+        },
+      },
+    );
 
     if (!attendances) { return res.status(400).json({ error: 'Attendance not found' }); }
 
-    const clientAttendances = attendances.filter((attendance) => attendance.client === client);
-
-    return res.json(clientAttendances);
+    return res.json(attendances);
   },
 
   async update(req, res) {
