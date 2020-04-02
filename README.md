@@ -1,0 +1,1 @@
+### Conversão de uma API originialmente provida com MySQL, para a abstração permitida por uma ORM, no caso, Sequelize
