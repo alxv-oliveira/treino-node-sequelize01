@@ -2,63 +2,58 @@ const moment = require('moment');
 const Attendance = require('../models/Attendance');
 
 module.exports = {
-    async index(req, res) {
-        const attendances = await Attendance.findAll();
+  async index(req, res) {
+    const attendances = await Attendance.findAll();
 
-        return res.json(attendances);
-    },
+    return res.json(attendances);
+  },
 
-    async store(req, res) {
-        try {
-            const { client, pet, service, status, observations } = req.body;
-            const date = moment(req.body.date, 'DD/MM/YYYY').format('YYYY-MM-DD HH:MM:SS');
-            
-            const attendance = await Attendance.create({
-                client, pet, service, date, status, observations
-            });
+  async store(req, res) {
+    const {
+      client, pet, service, status, observations,
+    } = req.body;
 
-            return res.json(attendance);
-        } catch(err) {
-            return res.status(400).json({ error: err.message });
-        }
-    },
+    const date = moment(req.body.date, 'DD/MM/YYYY').format('YYYY-MM-DD HH:MM:SS');
 
-    async show(req, res) {
-        const { client } = req.query;
-        
-        const attendances = await Attendance.findAll();
+    const attendance = await Attendance.create({
+      client, pet, service, date, status, observations,
+    });
 
-        if(!attendances)
-            return res.status(400).json({ error: 'Attendance not found' });
+    return res.json(attendance);
+  },
 
-        const clientAttendances = attendances.filter(attendance => attendance.client === client);
+  async show(req, res) {
+    const { client } = req.query;
 
-        return res.json(clientAttendances);
-    },
+    const attendances = await Attendance.findAll();
 
-    async update(req, res) {
-        const { id } = req.params;
-        if(req.body.date)
-            req.body.date = moment(req.body.date, 'DD/MM/YYYY').format('YYYY-MM-DD HH:MM:SS');
+    if (!attendances) { return res.status(400).json({ error: 'Attendance not found' }); }
 
-        const attendance = await (await Attendance.findByPk(id)).update(req.body);
+    const clientAttendances = attendances.filter((attendance) => attendance.client === client);
 
-        if(!attendance)
-            return res.status(400).json({ error: 'Attendance not found' });
+    return res.json(clientAttendances);
+  },
 
-        return res.json(attendance);
-    },
+  async update(req, res) {
+    const { id } = req.params;
+    if (req.body.date) { req.body.date = moment(req.body.date, 'DD/MM/YYYY').format('YYYY-MM-DD HH:MM:SS'); }
 
-    async delete(req, res) {
-        const { id } = req.params;
+    const attendance = await (await Attendance.findByPk(id)).update(req.body);
 
-        const attendance = await Attendance.findByPk(id);
+    if (!attendance) { return res.status(400).json({ error: 'Attendance not found' }); }
 
-        if(!attendance)
-            return res.status(400).json({ error: 'Attendance not found' });
+    return res.json(attendance);
+  },
 
-        attendance.destroy();
+  async delete(req, res) {
+    const { id } = req.params;
 
-        return res.json();
-    }
-}
+    const attendance = await Attendance.findByPk(id);
+
+    if (!attendance) { return res.status(400).json({ error: 'Attendance not found' }); }
+
+    attendance.destroy();
+
+    return res.json();
+  },
+};
